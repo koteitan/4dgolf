@@ -29,7 +29,10 @@
 <canvas id="canvas0" width="512" height="512" style="background-color:black"></canvas>
 </td></tr></table>
 <div><form name=form1>
-<input type="button" onclick="javascript:resetGame();" value="RESTART"> the game from the Hole # <input name="holeinput" type=text id="holeinput" value="1" class="console"></input></form></div>
+<input type="button" onclick="javascript:form1.holeinput.value--;resetGame();" value="©"></input>
+Hole # <input name="holeinput" type=text id="holeinput" value="1" class="console"></input>
+<input type="button" onclick="javascript:form1.holeinput.value++;resetGame();" value="¨"></input>
+</form></div>
 <div id="debugout"> </div>
 <br>
 <hr>

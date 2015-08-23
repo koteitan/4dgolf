@@ -96,7 +96,7 @@ var initGame=function(){
   //make tee & goal
   startpos=[0,0,0];
   goalpos=new Array(3);
-  for(var d=0;d<3;d++) goalpos[d]=(holerand.getNext()+0.5)*0.9+fairway[fairway.length-1][d];
+  for(var d=0;d<3;d++) goalpos[d]=(holerand.getNext()-0.5)*0.9+fairway[fairway.length-1][d];
   nowpos=startpos.clone();
   var a = mulkv(sqrt1p2(), normalize(sub(goalpos,nowpos))); // 45 degree +w
   shotImpactAngle   = [a[0],a[1],a[2],sqrt1p2];             // 45 degree +w

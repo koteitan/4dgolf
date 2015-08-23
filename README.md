@@ -1,5 +1,5 @@
 # 4 Dimensional Golf Game
-http://www.ukaibutton.com/4dgolf/
+Demo -> http://www.ukaibutton.com/4dgolf/
 
 ４次元のゴルフゲームです。
 ３次元空間上に緑の四角のフェアウェイがあって、
