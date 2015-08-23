@@ -57,6 +57,7 @@ var isKeyTyping;
 var mdposC; // position at mousedown in CameraView coordinate
 var mmposC; // position at mousemove in CameraView coordinate
 var mdcam;  // Camera object of mousedown
+var Rdrag = fairways; // radius to drag
 //init event---------------------
 var initEvent = function(){
   eventQueue = new Array(0);
@@ -199,10 +200,11 @@ var handleMouseDown = function(){
 var handleMouseDragging = function(){
   mmposC = transPos([mousePos[0],mousePos[1],cam.screenDistance],gS,gP);
   var invcamr = getRotate(cam0.dirmz, cam0.dirx, cam.dirmz, cam.dirx);
-  var mdposP = add(mul(invcamr, mdposC),cam.pos);
-  var mmposP = add(mul(invcamr, mmposC),cam.pos);
+  var mdposP = mul(invcamr, mdposC);
+  var mmposP = mul(invcamr, mmposC);
   var r = getRotate(mdposP, mmposP);
-  //ÉJÉÅÉââÒì]
+  //ÉJÉÅÉâà íuâÒì]
+  cam.pos   = mul(r, mdcam.pos);
   cam.dirmz = mul(r, mdcam.dirmz);
   cam.dirx  = mul(r, mdcam.dirx);
   isRequestedDraw = true;
