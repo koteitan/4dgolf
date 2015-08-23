@@ -77,7 +77,7 @@ var transCam = function(target, c, c0, gW, gS){
   var sx = new Array(3);
   sx[0] = transPosElem(psx[0], 0, gW, gS);
   sx[1] = transPosElem(psx[1], 1, gW, gS);
-  sx[2] = transScale(psx[2], 2, gW, gS);
+  sx[2] = transScaleElem(psx[2], 2, gW, gS);
   return sx;
 };
 
