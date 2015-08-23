@@ -32,10 +32,10 @@ var Camera = function(_pos, _dirmz, _dirx, _screenDistance){
     this.dirx  = _dirx;
     this.screenDistance  = _screenDistance;
   }else{
-    this.pos   = [0,0,3];
+    this.pos   = [0,0, 7];
     this.dirmz = [0,0,-1];
-    this.dirx  = [1,0,0];
-    this.screenDistance  = -1;
+    this.dirx  = [1,0, 0];
+    this.screenDistance  = 1;
   }
 };
 Camera.prototype.clone=function(){ 
@@ -72,7 +72,7 @@ var transCam = function(target, c, c0, gW, gS){
   var camr = getRotate(c.dirmz, c.dirx, c0.dirmz, c0.dirx);
   var cx = mulxv(camr, sub(target, c.pos));
   var psz = c.screenDistance/cx[2];
-  var psx = [cx[0] * psz, cx[1] * psz , psz];
+  var psx = [cx[0] * psz, cx[1] * psz , -psz];
   //スクリーン座標系に変換
   var sx = new Array(3);
   sx[0] = transPosElem(psx[0], 0, gW, gS);

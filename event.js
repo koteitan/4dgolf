@@ -10,6 +10,7 @@ var eventsMax  = 100;
 var lastEvent;       
 //mouse events
 var isDragging = false;
+var isMouseOver = false;
 var mouseDownPos = [-1,-1];
 var mousePos     = [-1,-1];
 var mouseUpPos   = [-1,-1];
@@ -32,6 +33,7 @@ var procEvent = function(){
         isDragging = true;
       break;
       case "mousemove":   // mouse move ---------
+        isMouseOver = true;
         mousePos = removeClientOffset(e);
         if(isDragging){
           handleMouseDragging();
@@ -39,6 +41,7 @@ var procEvent = function(){
       break;
       case "mouseup":   // mouse up ---------
       case "mouseout":   // mouse out ---------
+        isMouseOver = false;
         if(isDragging){
           mousePos   = removeClientOffset(e);
           mouseUpPos = mousePos.clone();
@@ -69,6 +72,13 @@ var procEvent = function(){
       case "keydown":   // mouse up ---------
       if(!isKeyTyping) handleKeyDown(e);
       break;
+      case "wheel":
+      if(isMouseOver){
+        mouseTarget = parseInt(e.target.id.substr(-1));
+        mouseWheel = [e.wheelDeltaX, e.wheelDeltaY];
+        handleMouseWheel();
+      }
+      break;
       default:
       break;
     }
@@ -77,14 +87,17 @@ var procEvent = function(){
 // sub routines
 // addEvent(Event e)
 var addEvent = function(e){
+  if(e.type=="mousewheel"){
+    var a=1;
+  }
   if(eventQueue.length < eventsMax && e!=undefined){
     eventQueue.push(e);
     lastEvent = e;//for debug
   }
-  
   if(e.type!="keydown" || e.type=="mousewheel"){
-    if(!isKeyTyping){
-      e.preventDefault();
+    if(!isKeyTyping && isMouseOver){
+      if(e.preventDefault) e.preventDefault();
+      e.returnValue = false;
     }
   }
 };

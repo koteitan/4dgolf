@@ -63,10 +63,11 @@ var initEvent = function(){
   canvas[0].ontouchstart = addTouchEvent;
   canvas[0].ontouchmove  = addTouchEvent;
   canvas[0].ontouchend   = addTouchEvent;
-  canvas[0].onmousedown = addEvent;
-  canvas[0].onmousemove = addEvent;
-  canvas[0].onmouseup   = addEvent;
-  canvas[0].onmouseout  = addEvent;
+  canvas[0].onmousedown  = addEvent;
+  canvas[0].onmousemove  = addEvent;
+  canvas[0].onmouseup    = addEvent;
+  canvas[0].onmouseout   = addEvent;
+  canvas[0].onmousewheel = addEvent;
 //  window.onkeydown       = addEvent;
 };
 //initialize game----------------------------
@@ -137,9 +138,6 @@ var initDraw=function(){
   cam.dirmz =normalize(sub([0,0,0],cam.pos));
   cam.dirx  =mul(getRotate(cam0.dirmz, cam0.dirx, cam.dirmz, cam.dirx),cam0.dirx);
 };
-var printDebug=function(str){
-  document.getElementById("debugout").innerHTML += str;
-}
 var procDraw=function(){
     //clear ---------
   ctx[0].clearRect(0, 0, wx-1, wy-1);
@@ -158,30 +156,38 @@ var procDraw=function(){
       fc[l][1] = add(fc[l][1], fairway[f]);
       var fc2d = [transCam(fc[l][0], cam, cam0, gP, gS), 
                   transCam(fc[l][1], cam, cam0, gP, gS)];
-      ctx[0].beginPath();
-      ctx[0].moveTo(fc2d[0][0],fc2d[0][1]);
-      ctx[0].lineTo(fc2d[1][0],fc2d[1][1]);
-      ctx[0].stroke();
+      if(fc2d[0][2]>=0 && fc2d[1][2]>=0){
+        ctx[0].beginPath();
+        ctx[0].moveTo(fc2d[0][0],fc2d[0][1]);
+        ctx[0].lineTo(fc2d[1][0],fc2d[1][1]);
+        ctx[0].stroke();
+      }
     }//i
   }//f
   //draw tee
   var p=transCam(startpos, cam, cam0, gP, gS);
-  ctx[0].fillStyle = 'rgb(0,0,255)'; //blue
-  ctx[0].beginPath();
-  ctx[0].arc(p[0], p[1], p[2]*Rstartpos, 0, Math.PI*2, false);
-  ctx[0].fill();
+  if(p[2]>=0){
+    ctx[0].fillStyle = 'rgb(0,0,255)'; //blue
+    ctx[0].beginPath();
+    ctx[0].arc(p[0], p[1], p[2]*Rstartpos, 0, Math.PI*2, false);
+    ctx[0].fill();
+  }
   //draw tee and goal
   ctx[0].fillStyle = 'rgb(255,255,0)'; //yellow
   var p=transCam(goalpos, cam, cam0, gP, gS);
-  ctx[0].beginPath();
-  ctx[0].arc(p[0], p[1], p[2]*Rgoalpos, 0, Math.PI*2, false);
-  ctx[0].fill();
+  if(p[2]>=0){
+    ctx[0].beginPath();
+    ctx[0].arc(p[0], p[1], p[2]*Rgoalpos, 0, Math.PI*2, false);
+    ctx[0].fill();
+  }
   //draw tee and goal
   ctx[0].fillStyle = 'rgb(255,255,255)'; //white
   var p=transCam(nowpos, cam, cam0, gP, gS);
-  ctx[0].beginPath();
-  ctx[0].arc(p[0], p[1], p[2]*Rnowpos, 0, Math.PI*2, false);
-  ctx[0].fill();
+  if(p[2]>=0){
+    ctx[0].beginPath();
+    ctx[0].arc(p[0], p[1], p[2]*Rnowpos, 0, Math.PI*2, false);
+    ctx[0].fill();
+  }
 }
 //event handlers after queue ------------
 var handleMouseDown = function(){
@@ -192,14 +198,31 @@ var handleMouseDown = function(){
 }
 var handleMouseDragging = function(){
   mmposC = transPos([mousePos[0],mousePos[1],cam.screenDistance],gS,gP);
-  var invcamr = getRotate(cam.dirmz, cam.dirx, cam0.dirmz, cam0.dirx);
-  var mdposP = mul(invcamr, mdposC);
-  var mmposP = mul(invcamr, mmposC);
-  var r = getRotate(mdposP, mmposP);
+  var invcamr = getRotate(cam0.dirmz, cam0.dirx, cam.dirmz, cam.dirx);
+  var mdposP = add(mul(invcamr, mdposC),cam.pos);
+  var mmposP = add(mul(invcamr, mmposC),cam.pos);
+  var r = getRotate(mmposP, mdposP);
   //ÉJÉÅÉââÒì]
-  cam.dirz = mul(r, mdcam.dirmz);
-  cam.dirx = mul(r, mdcam.dirx);
+  cam.dirmz = mul(r, mdcam.dirmz);
+  cam.dirx  = mul(r, mdcam.dirx);
   isRequestedDraw = true;
+  clsDebug();
+  if(false){
+    printDebug("mdposP[0]="+mdposP[0]+"<br>");
+    printDebug("mdposP[1]="+mdposP[1]+"<br>");
+    printDebug("mdposP[2]="+mdposP[2]+"<br>");
+    printDebug("mmposP[0]="+mmposP[0]+"<br>");
+    printDebug("mmposP[1]="+mmposP[1]+"<br>");
+    printDebug("mmposP[2]="+mmposP[2]+"<br>");
+  }
+  if(false){
+    printDebug("mdposP[0]="+mdposP[0]+"<br>");
+    printDebug("mdposP[1]="+mdposP[1]+"<br>");
+    printDebug("mdposP[2]="+mdposP[2]+"<br>");
+    printDebug("mmposP[0]="+mmposP[0]+"<br>");
+    printDebug("mmposP[1]="+mmposP[1]+"<br>");
+    printDebug("mmposP[2]="+mmposP[2]+"<br>");
+  }
 }
 var handleMouseUp = function(){
 }
@@ -207,13 +230,18 @@ var handleMouseMoving = function(){
 //
 }
 var handleMouseWheel = function(){
-  if(mouseWheel[0]>0) moveCursor(0);
-  if(mouseWheel[0]<0) moveCursor(4);
-  if(mouseWheel[1]>0) moveCursor(1);
-  if(mouseWheel[1]<0) moveCursor(5);
+  var dz = mouseWheel[1]*0.01;
+  cam.pos=add(cam.pos, mulkv(dz, cam.dirmz));
   isRequestedDraw = true;
 }
 var handleKeyDown = function(e){
 //    var c = String.fromCharCode(e.keyCode);
 //    var motion = "AW__DX__".indexOf(c);
 }
+var printDebug=function(str){
+  document.getElementById("debugout").innerHTML += str;
+}
+var clsDebug=function(str){
+  document.getElementById("debugout").innerHTML = "";
+}
+
