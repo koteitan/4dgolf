@@ -1,4 +1,5 @@
 window.onload=function(){ //entry point
+  window.onresize();
   initGame();
 };
 window.onresize = function(){
@@ -25,7 +26,9 @@ var isRequestedDraw = false;
 //initialize game----------------------------
 var initGame=function(){
   turn=1;
-//  XorShift.rand()/(1<<31)/2;
+  putDebug(XorShift.test(123)+"<br>");
+  putDebug(XorShift.test(456)+"<br>");
+  putDebug(XorShift.test(123)+"<br>");
 };
 //when push send button ---------------------
 var receiveCommand=function(str){
