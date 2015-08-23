@@ -72,7 +72,7 @@ var transCam = function(target, c, c0, gW, gS){
   var camr = getRotate(c.dirmz, c.dirx, c0.dirmz, c0.dirx);
   var cx = mulxv(camr, sub(target, c.pos));
   var psz = c.screenDistance/cx[2];
-  var psx = [cx[0] * psz, cx[1] * psz , -psz];
+  var psx = [cx[0] * psz, cx[1] * psz , psz];
   //スクリーン座標系に変換
   var sx = new Array(3);
   sx[0] = transPosElem(psx[0], 0, gW, gS);
@@ -150,3 +150,15 @@ var testGeom=function(){
   str += "ww=" + mat2str(g0.iww) + " , ";
   return str;
 };
+/*  cam.pos =(0,0,0) とスクリーン上の点 (sxi, syi) の直線をカメラ座標系で返す */
+var getCamLine=function(cam, sxi, syi){
+  var cl = new Array(2);
+  c[0]=new Array(3);
+  c[1]=new Array(3);
+  // cl[0]={0,0,0};
+  //スクリーン座標系 → カメラ座標系に変換
+  cl[1][0] = gS.transPos(sxi, 0, gP);
+  cl[1][1] = gS.transPos(syi, 1, gP);
+  cl[1][2] = cam.screenDistance;
+  return cl;
+}
