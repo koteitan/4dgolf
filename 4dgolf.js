@@ -201,7 +201,7 @@ var handleMouseDragging = function(){
   var invcamr = getRotate(cam0.dirmz, cam0.dirx, cam.dirmz, cam.dirx);
   var mdposP = add(mul(invcamr, mdposC),cam.pos);
   var mmposP = add(mul(invcamr, mmposC),cam.pos);
-  var r = getRotate(mmposP, mdposP);
+  var r = getRotate(mdposP, mmposP);
   //ÉJÉÅÉââÒì]
   cam.dirmz = mul(r, mdcam.dirmz);
   cam.dirx  = mul(r, mdcam.dirx);
