@@ -2,6 +2,7 @@ window.onload=function(){ //entry point
   window.onresize();
   initGame();
   initDraw();
+  initEvent();
   setInterval(procAll, 1000/frameRate);
 };
 var procAll=function(){ //main loop
@@ -9,19 +10,22 @@ var procAll=function(){ //main loop
     procDraw();
     isRequestedDraw = false;
   }
+  procEvent();
 }
 window.onresize = function(){
   var agent = navigator.userAgent;
   if( agent.search(/iPhone/) != -1 || agent.search(/iPod/) != -1 || agent.search(/iPad/) != -1){
-    document.getElementById("canvas0").width  = 512;
-    document.getElementById("canvas0").height = 512;
+    wx = 512;
+    wy = 512;
   }else{
     var newWidth  = [document.documentElement.clientWidth-300, 320].max();
     var newHeight = [(document.documentElement.clientHeight-160)*0.9, 180].max();
     var newSize = [newWidth, newHeight].min();
-    document.getElementById("canvas0").width  = newSize;
-    document.getElementById("canvas0").height = newSize;
+    wx = newSize;
+    wy = newSize;
   }
+  document.getElementById("canvas0").width = wx;
+  document.getElementById("canvas0").height= wy;
   isRequestedDraw = true;
 };
 //fields for game ---------------------------
@@ -41,6 +45,7 @@ var isRequestedDraw = false;
 var cam; //camera object
 var gP;//physic coordinate
 var gS;//screen coordinate
+var wx, wy; // screen size
 var startpos; //startpos[d]
 var goalpos;  //goalpos[d]
 var nowpos;   //nowpos[d]
@@ -49,6 +54,21 @@ var Rgoalpos =0.05;
 var Rnowpos  =0.1;
 //field for event--------------------
 var isKeyTyping;
+var mdposC; // position at mousedown in CameraView coordinate
+var mmposC; // position at mousemove in CameraView coordinate
+var mdcam;  // Camera object of mousedown
+//init event---------------------
+var initEvent = function(){
+  eventQueue = new Array(0);
+  canvas[0].ontouchstart = addTouchEvent;
+  canvas[0].ontouchmove  = addTouchEvent;
+  canvas[0].ontouchend   = addTouchEvent;
+  canvas[0].onmousedown = addEvent;
+  canvas[0].onmousemove = addEvent;
+  canvas[0].onmouseup   = addEvent;
+  canvas[0].onmouseout  = addEvent;
+//  window.onkeydown       = addEvent;
+};
 //initialize game----------------------------
 var initGame=function(){
   //make hole
@@ -110,7 +130,7 @@ var initDraw=function(){
 
   //set coordinate
   gP  = new Geom(3,[[-1,-1,-1],[+1,+1,+1]]);
-  gS  = new Geom(3,[[0,1,0],[1,0,-1] ]);
+  gS  = new Geom(3,[[0,wy,0],[wx,0,wx] ]);
   cam = new Camera();
   cam0= new Camera();
   cam.pos=mulkv(fairways*0.5,[-1,-1,-1]);
@@ -122,8 +142,6 @@ var printDebug=function(str){
 }
 var procDraw=function(){
     //clear ---------
-  var wx = canvas[0].width;
-  var wy = canvas[0].height;
   ctx[0].clearRect(0, 0, wx-1, wy-1);
   //draw cource ------
   ctx[0].strokeWeight='1';
@@ -141,8 +159,8 @@ var procDraw=function(){
       var fc2d = [transCam(fc[l][0], cam, cam0, gP, gS), 
                   transCam(fc[l][1], cam, cam0, gP, gS)];
       ctx[0].beginPath();
-      ctx[0].moveTo(fc2d[0][0]*wx,fc2d[0][1]*wy);
-      ctx[0].lineTo(fc2d[1][0]*wx,fc2d[1][1]*wy);
+      ctx[0].moveTo(fc2d[0][0],fc2d[0][1]);
+      ctx[0].lineTo(fc2d[1][0],fc2d[1][1]);
       ctx[0].stroke();
     }//i
   }//f
@@ -150,46 +168,40 @@ var procDraw=function(){
   var p=transCam(startpos, cam, cam0, gP, gS);
   ctx[0].fillStyle = 'rgb(0,0,255)'; //blue
   ctx[0].beginPath();
-  ctx[0].arc(p[0]*wx, p[1]*wy, p[2]*wx*Rstartpos, 0, Math.PI*2, false);
+  ctx[0].arc(p[0], p[1], p[2]*Rstartpos, 0, Math.PI*2, false);
   ctx[0].fill();
   //draw tee and goal
   ctx[0].fillStyle = 'rgb(255,255,0)'; //yellow
   var p=transCam(goalpos, cam, cam0, gP, gS);
   ctx[0].beginPath();
-  ctx[0].arc(p[0]*wx, p[1]*wy, p[2]*wx*Rgoalpos, 0, Math.PI*2, false);
+  ctx[0].arc(p[0], p[1], p[2]*Rgoalpos, 0, Math.PI*2, false);
   ctx[0].fill();
   //draw tee and goal
   ctx[0].fillStyle = 'rgb(255,255,255)'; //white
   var p=transCam(nowpos, cam, cam0, gP, gS);
   ctx[0].beginPath();
-  ctx[0].arc(p[0]*wx, p[1]*wy, p[2]*wx*Rnowpos, 0, Math.PI*2, false);
+  ctx[0].arc(p[0], p[1], p[2]*Rnowpos, 0, Math.PI*2, false);
   ctx[0].fill();
 }
 //event handlers after queue ------------
 var handleMouseDown = function(){
-  if(gameState==gameState_shot){
-    sightposDown = display2World(mouseDownPos);
-    sightposUp = sightposDown.clone();
-    isRequestedDraw = true;
-  }
+  mdposC = transPos([mouseDownPos[0], mouseDownPos[1] ,cam.screenDistance],gS,gP);
+  mmposC = mdposC.clone();
+  mdcam  = cam.clone();
+  isRequestedDraw = true;
 }
 var handleMouseDragging = function(){
-  if(gameState==gameState_shot){
-    sightposUp = sightposDown.clone();
-    sightposUp[2] += (mousePos[0]-mouseDownPos[0])/canvas[0].width *2;
-    sightposUp[3] += (mousePos[1]-mouseDownPos[1])/canvas[0].height*2;
-    isRequestedDraw = true;
-  }
+  mmposC = transPos([mousePos[0],mousePos[1],cam.screenDistance],gS,gP);
+  var invcamr = getRotate(cam.dirmz, cam.dirx, cam0.dirmz, cam0.dirx);
+  var mdposP = mul(invcamr, mdposC);
+  var mmposP = mul(invcamr, mmposC);
+  var r = getRotate(mdposP, mmposP);
+  //ÉJÉÅÉââÒì]
+  cam.dirz = mul(r, mdcam.dirmz);
+  cam.dirx = mul(r, mdcam.dirx);
+  isRequestedDraw = true;
 }
 var handleMouseUp = function(){
-  if(gameState==gameState_shot){
-    sightposUp = sightposDown.clone();
-    sightposUp[2] += (mouseUpPos[0]-mouseDownPos[0])/canvas[0].width *2;
-    sightposUp[3] += (mouseUpPos[1]-mouseDownPos[1])/canvas[0].height*2;
-    for(var d=0;d<dims;d++) v[myball][d] = (sightposUp[d] - q[myball][d])*pos2velocity;
-    isRequestedDraw = true;
-    gameState=gameState_run;
-  }
 }
 var handleMouseMoving = function(){
 //
