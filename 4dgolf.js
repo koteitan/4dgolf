@@ -101,10 +101,7 @@ var initDraw=function(){
   cam.dirmz =normalize(sub([0,0,0],cam.pos));
   cam.dirx  =mul(getRotate(cam0.dirmz, cam0.dirx, cam.dirmz, cam.dirx),cam0.dirx);
 };
-var putOut=function(str){
-  document.getElementById("console").innerHTML += str;
-}
-var putDebug=function(str){
+var printDebug=function(str){
   document.getElementById("debugout").innerHTML += str;
 }
 var procDraw=function(){

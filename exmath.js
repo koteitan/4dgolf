@@ -19,7 +19,7 @@ var XorShift=function(s){
   this.z=521288629;
   this.seed=s;
   this.w=this.seed;
-  this.getNext();
+  for(var i=0;i<1000;i++) this.getNext(); // because randomness is very poor
 };
 // random float value 0.0<=x<+1.0
 XorShift.prototype.getNext = function() {
