@@ -7,7 +7,9 @@ var log2 = function(x){
 var ln = function(x){
   return Math.log(x);
 }
-
+var sqrt1p2=function(){
+  return 0.7071067811865475;
+}
 var chisqr_1_0p05 = function(){
   -3.841
 }
