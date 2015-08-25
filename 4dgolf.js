@@ -26,6 +26,7 @@ window.onresize = function(){
   }
   document.getElementById("canvas0").width = wx;
   document.getElementById("canvas0").height= wy;
+  gS  = new Geom(3,[[0,wy,0],[wx,0,wx] ]);
   isRequestedDraw = true;
 };
 //fields for game ---------------------------
@@ -33,15 +34,14 @@ var debug= false;
 var turn = 0;
 var turnstr=["black","white"];
 var holeinput;//cource[c]
-var fairways=7;
+var fairways=14;
 var fairway=new Array(fairways); //fairway[f][d]=location of fairway box in dimension d.
 var holerand;
 //fields for graphic ------------------------
 var frameRate = 60; // [fps]
 var canvas = new Array(2);
 var ctx    = new Array(2);
-var isRequestedDraw = true;
-var isRequestedDraw = false;
+var isRequestedDraw;
 var cam; //camera object
 var gP;//physic coordinate
 var gS;//screen coordinate
@@ -52,6 +52,11 @@ var nowpos;   //nowpos[d]
 var Rstartpos=0.05;
 var Rgoalpos =0.05;
 var Rnowpos  =0.1;
+var shotAngle3d;//shotAngle3d[3]
+var shotAnglew; //shotAnglew
+var HeadSpeed = 50;//[m/s]
+var Gravity=9.8;
+var mpfairways=64;
 //field for event--------------------
 var isKeyTyping;
 var mdposC; // position at mousedown in CameraView coordinate
@@ -99,7 +104,8 @@ var initGame=function(){
   for(var d=0;d<3;d++) goalpos[d]=(holerand.getNext()-0.5)*0.9+fairway[fairway.length-1][d];
   nowpos=startpos.clone();
   var a = mulkv(sqrt1p2(), normalize(sub(goalpos,nowpos))); // 45 degree +w
-  shotImpactAngle   = [a[0],a[1],a[2],sqrt1p2];             // 45 degree +w
+  shotAngle3d = [a[0],a[1],a[2]]; // 45 degree +w
+  shotAnglew  = sqrt1p2();
   turn=0;
 };
 var resetGame=function(){
@@ -188,6 +194,18 @@ var procDraw=function(){
     ctx[0].beginPath();
     ctx[0].arc(p[0], p[1], p[2]*Rnowpos, 0, Math.PI*2, false);
     ctx[0].fill();
+  }
+  //draw guide
+  var p0=transCam(nowpos, cam, cam0, gP, gS);
+  var v3d2=dot(shotAngle3d,shotAngle3d);
+  var l = 2*HeadSpeed*HeadSpeed*Math.sqrt(v3d2)*shotAnglew/Gravity/mpfairways;
+  var p1=transCam(add(nowpos,mulkv(l,shotAngle3d)), cam, cam0, gP, gS);
+  if(p0[2]>0 && p1[2]>=0){
+    ctx[0].strokeStyle = 'rgb(0,255,255)'; //cyan
+    ctx[0].beginPath();
+    ctx[0].moveTo(p0[0],p0[1]);
+    ctx[0].lineTo(p1[0],p1[1]);
+    ctx[0].stroke();
   }
 }
 //event handlers after queue ------------
