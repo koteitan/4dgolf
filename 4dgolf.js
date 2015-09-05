@@ -15,17 +15,17 @@ var procAll=function(){ //main loop
 window.onresize = function(){
   var agent = navigator.userAgent;
   if( agent.search(/iPhone/) != -1 || agent.search(/iPod/) != -1 || agent.search(/iPad/) != -1){
-    wx = 512;
-    wy = 512;
+    wx = 512/scale;
+    wy = 512/scale;
   }else{
     var newWidth  = [document.documentElement.clientWidth-300, 320].max();
     var newHeight = [(document.documentElement.clientHeight-160)*0.9, 180].max();
     var newSize = [newWidth, newHeight].min();
-    wx = newSize;
-    wy = newSize;
+    wx = newSize/scale;
+    wy = newSize/scale;
   }
-  document.getElementById("canvas0").width = wx;
-  document.getElementById("canvas0").height= wy;
+  document.getElementById("canvas0").width = wx*scale;
+  document.getElementById("canvas0").height= wy*scale;
   gS  = new Geom(3,[[0,wy,0],[wx,0,wx] ]);
   isRequestedDraw = true;
 };
@@ -38,6 +38,7 @@ var fairways=14;
 var fairway=new Array(fairways); //fairway[f][d]=location of fairway box in dimension d.
 var holerand;
 //fields for graphic ------------------------
+var scale=2;
 var frameRate = 60; // [fps]
 var canvas = new Array(2);
 var ctx    = new Array(2);
@@ -134,7 +135,8 @@ var initDraw=function(){
     canvas[i] = document.getElementById("canvas"+i);
     if(!canvas[i]||!canvas[i].getContext) return false;
     ctx[i] = canvas[i].getContext('2d');
-    ctx[i].webkitImageSmoothingEnabled=!1;
+    ctx[i].imageSmoothingEnabled=!1;
+    ctx[i].scale(scale,scale);
   }
   
   //set bitmap font
