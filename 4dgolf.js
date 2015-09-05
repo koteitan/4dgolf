@@ -134,6 +134,7 @@ var initDraw=function(){
     canvas[i] = document.getElementById("canvas"+i);
     if(!canvas[i]||!canvas[i].getContext) return false;
     ctx[i] = canvas[i].getContext('2d');
+    ctx[i].webkitImageSmoothingEnabled=!1;
   }
   
   //set bitmap font
@@ -228,37 +229,28 @@ var procDraw=function(){
     ctx[0].beginPath();
     ctx[0].arc(p[0], p[1], p[2]*Rstartpos, 0, Math.PI*2, false);
     ctx[0].fill();
-    //text guide
-    ctx[0].beginPath();
-    ctx[0].moveTo(p[0]   ,p[1]   );
-    ctx[0].lineTo(p[0]+10,p[1]+20);
-    ctx[0].stroke();
-    ctx[0].beginPath();
-    ctx[0].moveTo(p[0]+10,p[1]+20);
-    ctx[0].lineTo(p[0]   ,p[1]   );
-    ctx[0].stroke();
-    ctx[0].beginPath();
-    //text
-    ctx[0].fillTextBitmap(" !\"#$%'()*+,-./0123456789:;<=>?@ABCDEFGHIJK",0,0);
-    ctx[0].fillTextBitmap("LMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuv",0,9);
-    ctx[0].fillTextBitmap("wxyz{|}~abc",0,18);
-    ctx[0].fillTextBitmap("WHAT DO YOU FEEL THIS?",0,27);
+    ctx[0].strokeStyle = 'yellow'; //blue
+    ctx[0].guideText("TEE",p[0],p[1]);
   }
-  //draw tee and goal
-  ctx[0].fillStyle = 'rgb(255,255,0)'; //yellow
+  //draw goal
   var p=transCam(goalpos, cam, cam0, gP, gS);
   if(p[2]>=0){
+    ctx[0].fillStyle = 'rgb(255,255,0)'; //yellow
     ctx[0].beginPath();
     ctx[0].arc(p[0], p[1], p[2]*Rgoalpos, 0, Math.PI*2, false);
     ctx[0].fill();
+    ctx[0].strokeStyle = 'yellow'; //yellow
+    ctx[0].guideText("GOAL",p[0],p[1]);
   }
-  //draw tee and goal
-  ctx[0].fillStyle = 'rgb(255,255,255)'; //white
+  //draw ball
   var p=transCam(nowpos, cam, cam0, gP, gS);
   if(p[2]>=0){
+    ctx[0].fillStyle = 'rgb(255,255,255)'; //white
     ctx[0].beginPath();
     ctx[0].arc(p[0], p[1], p[2]*Rnowpos, 0, Math.PI*2, false);
     ctx[0].fill();
+    ctx[0].strokeStyle = 'yellow'; //white
+    ctx[0].guideText("BALL",p[0],p[1]);
   }
   //draw guide
   var p0=transCam(nowpos, cam, cam0, gP, gS);

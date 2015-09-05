@@ -6,6 +6,7 @@ document.getElementById("changelog").innerHTML =
 "<li>2015/08/24 00:30 デバッグ完了。マウスでパンするのが使いにくい</li>"+
 "<li>2015/08/24 00:40 ホールを回転する方に変更。</li>"+
 "<li>2015/08/25       照準を追加。まだ動かせない。一応サイズやら物理定数は一般的なゴルフのサイズから取ってきてる</li>"+
+"<li>2015/09/06       文字列の説明追加</li>"+
 "</ul>";
 document.getElementById("knownbugs").innerHTML = 
 "<ul>"+
