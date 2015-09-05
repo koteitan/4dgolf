@@ -135,6 +135,55 @@ var initDraw=function(){
     if(!canvas[i]||!canvas[i].getContext) return false;
     ctx[i] = canvas[i].getContext('2d');
   }
+  
+  //set bitmap font
+  var letterlist=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  var sizelist=new Array(96);
+  var poslist =new Array(96);
+  for(var i=0;i<sizelist.length;i++){
+    sizelist[i]=new Array(2);
+    poslist [i]=new Array(2);
+    sizelist[i][0]=4; //3x5 font with margin 1px
+    sizelist[i][1]=6; //3x5 font with margin 1px
+    poslist [i][0]=1;
+    poslist [i][1]=1;
+  }
+  sizelist[letterlist.indexOf("!")]=[2,6];
+  sizelist[letterlist.indexOf("#")]=[5,6];
+  sizelist[letterlist.indexOf("'")]=[2,6];
+  sizelist[letterlist.indexOf("(")]=[3,6];
+  sizelist[letterlist.indexOf(")")]=[3,6];
+  sizelist[letterlist.indexOf(",")]=[3,6];
+  sizelist[letterlist.indexOf(".")]=[2,6];
+  sizelist[letterlist.indexOf(":")]=[2,6];
+  sizelist[letterlist.indexOf(";")]=[3,6];
+  sizelist[letterlist.indexOf("[")]=[3,6];
+  sizelist[letterlist.indexOf("]")]=[3,6];
+  sizelist[letterlist.indexOf("`")]=[3,6];
+  sizelist[letterlist.indexOf("M")]=[6,6];
+  sizelist[letterlist.indexOf("N")]=[5,6];
+  sizelist[letterlist.indexOf("Q")]=[4,7];
+  sizelist[letterlist.indexOf("W")]=[6,6];
+  sizelist[letterlist.indexOf("g")]=[4,8];
+  sizelist[letterlist.indexOf("i")]=[2,6];
+  sizelist[letterlist.indexOf("j")]=[3,8];
+  sizelist[letterlist.indexOf("l")]=[2,6];
+  sizelist[letterlist.indexOf("m")]=[6,6];
+  sizelist[letterlist.indexOf("p")]=[4,8];
+  sizelist[letterlist.indexOf("q")]=[4,8];
+  sizelist[letterlist.indexOf("w")]=[6,6];
+  sizelist[letterlist.indexOf("y")]=[4,8];
+  sizelist[letterlist.indexOf("~")]=[5,6];
+  sizelist[letterlist.indexOf("|")]=[2,6];
+  var posxx=6;
+  var posyy=9;
+  for(var x=0;x<16;x++){
+    for(var y=0;y<6;y++){
+      poslist[y*16+x][0] = x*posxx+1;
+      poslist[y*16+x][1] = y*posyy+1;
+    }
+  }
+  ctx[0].setBitmapFont("font.png", poslist, sizelist, letterlist);
 
   //set coordinate
   gP  = new Geom(3,[[-1,-1,-1],[+1,+1,+1]]);
@@ -144,6 +193,7 @@ var initDraw=function(){
   cam.pos=mulkv(fairways*0.5,[-1,-1,-1]);
   cam.dirmz =normalize(sub([0,0,0],cam.pos));
   cam.dirx  =mul(getRotate(cam0.dirmz, cam0.dirx, cam.dirmz, cam.dirx),cam0.dirx);
+
 };
 var procDraw=function(){
     //clear ---------
@@ -178,6 +228,21 @@ var procDraw=function(){
     ctx[0].beginPath();
     ctx[0].arc(p[0], p[1], p[2]*Rstartpos, 0, Math.PI*2, false);
     ctx[0].fill();
+    //text guide
+    ctx[0].beginPath();
+    ctx[0].moveTo(p[0]   ,p[1]   );
+    ctx[0].lineTo(p[0]+10,p[1]+20);
+    ctx[0].stroke();
+    ctx[0].beginPath();
+    ctx[0].moveTo(p[0]+10,p[1]+20);
+    ctx[0].lineTo(p[0]   ,p[1]   );
+    ctx[0].stroke();
+    ctx[0].beginPath();
+    //text
+    ctx[0].fillTextBitmap(" !\"#$%'()*+,-./0123456789:;<=>?@ABCDEFGHIJK",0,0);
+    ctx[0].fillTextBitmap("LMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuv",0,9);
+    ctx[0].fillTextBitmap("wxyz{|}~abc",0,18);
+    ctx[0].fillTextBitmap("WHAT DO YOU FEEL THIS?",0,27);
   }
   //draw tee and goal
   ctx[0].fillStyle = 'rgb(255,255,0)'; //yellow
@@ -255,8 +320,10 @@ var handleMouseWheel = function(){
   isRequestedDraw = true;
 }
 var handleKeyDown = function(e){
-//    var c = String.fromCharCode(e.keyCode);
-//    var motion = "AW__DX__".indexOf(c);
+    var c = String.fromCharCode(e.keyCode);
+    var motion = "adsw".indexOf(c);
+    var dtheta=[-1,+1,0,0];
+    var dphi  =[0,0,-1,+1];
 }
 var printDebug=function(str){
   document.getElementById("debugout").innerHTML += str;

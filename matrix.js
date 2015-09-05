@@ -191,6 +191,13 @@ var normalize=function(a){
   }
   return b;
 };
+  /* 任意軸回転行列 R(A,theta) 
+     in :a     = 単位回転ベクトル 
+        :theta = 回転角（ラジアン）
+        :cos   = cos(theta)
+        :sin   = sin(theta)
+     out:R = 回転行列
+     Rodrigues' Rotation Formula より */
 var ang2rot=function(a, cos, sin){
   cos1 = 1-cos;
   return [
