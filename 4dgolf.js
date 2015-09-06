@@ -15,17 +15,17 @@ var procAll=function(){ //main loop
 window.onresize = function(){
   var agent = navigator.userAgent;
   if( agent.search(/iPhone/) != -1 || agent.search(/iPod/) != -1 || agent.search(/iPad/) != -1){
-    wx = 512/scale;
-    wy = 512/scale;
+    wx = 512;
+    wy = 512;
   }else{
     var newWidth  = [document.documentElement.clientWidth-300, 320].max();
     var newHeight = [(document.documentElement.clientHeight-160)*0.9, 180].max();
     var newSize = [newWidth, newHeight].min();
-    wx = newSize/scale;
-    wy = newSize/scale;
+    wx = newSize;
+    wy = newSize;
   }
-  document.getElementById("canvas0").width = wx*scale;
-  document.getElementById("canvas0").height= wy*scale;
+  document.getElementById("canvas0").width = wx;
+  document.getElementById("canvas0").height= wy;
   gS  = new Geom(3,[[0,wy,0],[wx,0,wx] ]);
   isRequestedDraw = true;
 };
@@ -53,8 +53,8 @@ var nowpos;   //nowpos[d]
 var Rstartpos=0.05;
 var Rgoalpos =0.05;
 var Rnowpos  =0.1;
-var shotAngle3d;//shotAngle3d[3]
-var shotAnglew; //shotAnglew
+var shotAngle3d;//shotAngle3d[d] = shot Angle in 3D (d=dimension)
+var shotAnglew; //shotAngle in dimension w
 var HeadSpeed = 50;//[m/s]
 var Gravity=9.8;
 var mpfairways=64;
@@ -135,8 +135,6 @@ var initDraw=function(){
     canvas[i] = document.getElementById("canvas"+i);
     if(!canvas[i]||!canvas[i].getContext) return false;
     ctx[i] = canvas[i].getContext('2d');
-    ctx[i].imageSmoothingEnabled=!1;
-    ctx[i].scale(scale,scale);
   }
   
   //set bitmap font
@@ -146,44 +144,44 @@ var initDraw=function(){
   for(var i=0;i<sizelist.length;i++){
     sizelist[i]=new Array(2);
     poslist [i]=new Array(2);
-    sizelist[i][0]=4; //3x5 font with margin 1px
-    sizelist[i][1]=6; //3x5 font with margin 1px
-    poslist [i][0]=1;
-    poslist [i][1]=1;
+    sizelist[i][0]=8; //((3px+margin1px),(5px+margin1px))xscale2
+    sizelist[i][1]=12;
+    poslist [i][0]=2;
+    poslist [i][1]=2;
   }
-  sizelist[letterlist.indexOf("!")]=[2,6];
-  sizelist[letterlist.indexOf("#")]=[5,6];
-  sizelist[letterlist.indexOf("'")]=[2,6];
-  sizelist[letterlist.indexOf("(")]=[3,6];
-  sizelist[letterlist.indexOf(")")]=[3,6];
-  sizelist[letterlist.indexOf(",")]=[3,6];
-  sizelist[letterlist.indexOf(".")]=[2,6];
-  sizelist[letterlist.indexOf(":")]=[2,6];
-  sizelist[letterlist.indexOf(";")]=[3,6];
-  sizelist[letterlist.indexOf("[")]=[3,6];
-  sizelist[letterlist.indexOf("]")]=[3,6];
-  sizelist[letterlist.indexOf("`")]=[3,6];
-  sizelist[letterlist.indexOf("M")]=[6,6];
-  sizelist[letterlist.indexOf("N")]=[5,6];
-  sizelist[letterlist.indexOf("Q")]=[4,7];
-  sizelist[letterlist.indexOf("W")]=[6,6];
-  sizelist[letterlist.indexOf("g")]=[4,8];
-  sizelist[letterlist.indexOf("i")]=[2,6];
-  sizelist[letterlist.indexOf("j")]=[3,8];
-  sizelist[letterlist.indexOf("l")]=[2,6];
-  sizelist[letterlist.indexOf("m")]=[6,6];
-  sizelist[letterlist.indexOf("p")]=[4,8];
-  sizelist[letterlist.indexOf("q")]=[4,8];
-  sizelist[letterlist.indexOf("w")]=[6,6];
-  sizelist[letterlist.indexOf("y")]=[4,8];
-  sizelist[letterlist.indexOf("~")]=[5,6];
-  sizelist[letterlist.indexOf("|")]=[2,6];
-  var posxx=6;
-  var posyy=9;
+  sizelist[letterlist.indexOf("!")]=[ 4,12];
+  sizelist[letterlist.indexOf("#")]=[10,12];
+  sizelist[letterlist.indexOf("'")]=[ 4,12];
+  sizelist[letterlist.indexOf("(")]=[ 6,12];
+  sizelist[letterlist.indexOf(")")]=[ 6,12];
+  sizelist[letterlist.indexOf(",")]=[ 6,12];
+  sizelist[letterlist.indexOf(".")]=[ 4,12];
+  sizelist[letterlist.indexOf(":")]=[ 4,12];
+  sizelist[letterlist.indexOf(";")]=[ 6,12];
+  sizelist[letterlist.indexOf("[")]=[ 6,12];
+  sizelist[letterlist.indexOf("]")]=[ 6,12];
+  sizelist[letterlist.indexOf("`")]=[ 6,12];
+  sizelist[letterlist.indexOf("M")]=[12,12];
+  sizelist[letterlist.indexOf("N")]=[10,12];
+  sizelist[letterlist.indexOf("Q")]=[16,14];
+  sizelist[letterlist.indexOf("W")]=[12,12];
+  sizelist[letterlist.indexOf("g")]=[ 8,16];
+  sizelist[letterlist.indexOf("i")]=[ 4,12];
+  sizelist[letterlist.indexOf("j")]=[ 6,16];
+  sizelist[letterlist.indexOf("l")]=[ 4,12];
+  sizelist[letterlist.indexOf("m")]=[12,12];
+  sizelist[letterlist.indexOf("p")]=[ 8,16];
+  sizelist[letterlist.indexOf("q")]=[ 8,16];
+  sizelist[letterlist.indexOf("w")]=[12,12];
+  sizelist[letterlist.indexOf("y")]=[ 8,16];
+  sizelist[letterlist.indexOf("~")]=[10,12];
+  sizelist[letterlist.indexOf("|")]=[ 4,12];
+  var posxx=12;
+  var posyy=18;
   for(var x=0;x<16;x++){
     for(var y=0;y<6;y++){
-      poslist[y*16+x][0] = x*posxx+1;
-      poslist[y*16+x][1] = y*posyy+1;
+      poslist[y*16+x][0] = x*posxx+2;
+      poslist[y*16+x][1] = y*posyy+2;
     }
   }
   ctx[0].setBitmapFont("font.png", poslist, sizelist, letterlist);
@@ -285,23 +283,6 @@ var handleMouseDragging = function(){
   cam.dirmz = mul(r, mdcam.dirmz);
   cam.dirx  = mul(r, mdcam.dirx);
   isRequestedDraw = true;
-  clsDebug();
-  if(false){
-    printDebug("mdposP[0]="+mdposP[0]+"<br>");
-    printDebug("mdposP[1]="+mdposP[1]+"<br>");
-    printDebug("mdposP[2]="+mdposP[2]+"<br>");
-    printDebug("mmposP[0]="+mmposP[0]+"<br>");
-    printDebug("mmposP[1]="+mmposP[1]+"<br>");
-    printDebug("mmposP[2]="+mmposP[2]+"<br>");
-  }
-  if(false){
-    printDebug("mdposP[0]="+mdposP[0]+"<br>");
-    printDebug("mdposP[1]="+mdposP[1]+"<br>");
-    printDebug("mdposP[2]="+mdposP[2]+"<br>");
-    printDebug("mmposP[0]="+mmposP[0]+"<br>");
-    printDebug("mmposP[1]="+mmposP[1]+"<br>");
-    printDebug("mmposP[2]="+mmposP[2]+"<br>");
-  }
 }
 var handleMouseUp = function(){
 }
