@@ -62,7 +62,8 @@ var mpfairways=64;
 var isKeyTyping;
 var mdposC; // position at mousedown in CameraView coordinate
 var mmposC; // position at mousemove in CameraView coordinate
-var mdcam;  // Camera object of mousedown
+var mdcam;         // Camera object at mousedown
+var mdshotAngle3d; // shot angle at mousedown
 var Rdrag = fairways; // radius to drag
 //init event---------------------
 var initEvent = function(){
@@ -269,7 +270,8 @@ var procDraw=function(){
 var handleMouseDown = function(){
   mdposC = transPos([mouseDownPos[0], mouseDownPos[1] ,cam.screenDistance],gS,gP);
   mmposC = mdposC.clone();
-  mdcam  = cam.clone();
+  mdcam         = cam.clone();
+  mdshotAngle3d = shotAngle3d.clone();
   isRequestedDraw = true;
 }
 var handleMouseDragging = function(){
@@ -277,11 +279,17 @@ var handleMouseDragging = function(){
   var invcamr = getRotate(cam0.dirmz, cam0.dirx, cam.dirmz, cam.dirx);
   var mdposP = mul(invcamr, mdposC);
   var mmposP = mul(invcamr, mmposC);
-  var r = getRotate(mdposP, mmposP);
-  //カメラ位置回転
-  cam.pos   = mul(r, mdcam.pos);
-  cam.dirmz = mul(r, mdcam.dirmz);
-  cam.dirx  = mul(r, mdcam.dirx);
+  if(isShiftKey){
+    //shiftキー押しているなら
+	var invr = getRotate(mmposP, mdposP);
+    shotAngle3d = mul(invr, mdshotAngle3d);
+  }else{
+    //カメラ位置回転
+    var r = getRotate(mdposP, mmposP);
+    cam.pos   = mul(r, mdcam.pos);
+    cam.dirmz = mul(r, mdcam.dirmz);
+    cam.dirx  = mul(r, mdcam.dirx);
+  }
   isRequestedDraw = true;
 }
 var handleMouseUp = function(){
