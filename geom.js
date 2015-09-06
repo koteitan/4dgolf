@@ -125,7 +125,7 @@ var getRotate = function(ina0, inb0, ina1, inb1){
     var b1 = normalize(inb1);
     
     // ‚Ü‚¸‚Í a0¨a1 ‚Å‡‚í‚¹‚é‰ñ“] r0
-    var r0 = getRotate(a0, a1); 
+    var r0 = getRotatePos(a0, a1); 
     var b2 = mul(r0, b0); // b2 = r0 Œã‚Ì b0
     
     // b2 ‚ğ b1 ‚É“®‚©‚·‰ñ“] r1 ‚ğ‹‚ß‚éB²‚Í a1 ‚É‚·‚ê‚Î‚æ‚¢
