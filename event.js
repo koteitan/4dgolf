@@ -11,6 +11,7 @@ var lastEvent;
 //mouse events
 var isDragging = false;
 var isMouseOver = false;
+var isShiftKey = false;
 var mouseDownPos = [-1,-1];
 var mousePos     = [-1,-1];
 var mouseUpPos   = [-1,-1];
@@ -29,6 +30,7 @@ var procEvent = function(){
       case "mousedown": // mouse down ---------
         mouseDownPos = removeClientOffset(e);
         mousePos     = mouseDownPos.clone();
+        isShiftKey   = e.shiftKey;
         handleMouseDown();
         isDragging = true;
       break;
